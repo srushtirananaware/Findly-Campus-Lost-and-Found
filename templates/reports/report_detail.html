@@ -1,0 +1,54 @@
+
+{% extends "base.html" %}
+{% block title %}{{ report.title }} · Findly{% endblock %}
+{% block content %}
+<div class="page-head"><a href="{% url 'report_list' %}">← Back to reports</a></div>
+<div class="detail-layout">
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px"><span class="pill {% if report.kind == 'LOST' %}pill-lost{% else %}pill-found{% endif %}">{{ report.get_kind_display }} item</span><span class="pill {% if report.status == 'RESOLVED' %}pill-resolved{% endif %}">{{ report.get_status_display }}</span></div>
+    {% if report.photo %}<img class="detail-photo" src="{{ report.photo.url }}" alt="Photo of {{ report.title }}">{% else %}<div class="report-photo" style="height:220px;border-radius:16px;margin-bottom:22px">🔎</div>{% endif %}
+    <div style="margin-top:23px"><div class="eyebrow">{{ report.get_category_display }}</div><h1 style="font-size:clamp(2rem,4vw,3.1rem)">{{ report.title }}</h1></div>
+    <div class="report-meta"><span>⌖ {{ report.location }}</span><span>·</span><span>📅 {{ report.item_date|date:"F j, Y" }}</span><span>·</span><span>Posted {{ report.created_at|date:"M j" }}</span></div>
+    <h3 style="margin-top:26px">Item details</h3><p class="detail-description">{{ report.description }}</p>
+    <div class="privacy-note">🔒 Contact details stay private. Don't share student IDs, passwords or full payment details in messages.</div>
+    {% if is_owner %}
+      <div class="actions" style="margin-top:20px"><a class="btn btn-light" href="{% url 'report_edit' report.pk %}">Edit report</a><a class="btn btn-light" href="{% url 'matches' report.pk %}">🧩 Possible matches</a></div>
+      <form method="post" action="{% url 'report_status' report.pk %}" style="margin-top:18px" data-confirm="Update this report status?">{% csrf_token %}
+        <div class="field"><label for="status">Update status</label><select id="status" name="status"><option value="OPEN" {% if report.status == 'OPEN' %}selected{% endif %}>Open</option><option value="RESOLVED" {% if report.status == 'RESOLVED' %}selected{% endif %}>Resolved / returned</option><option value="ARCHIVED" {% if report.status == 'ARCHIVED' %}selected{% endif %}>Archive</option></select></div><button class="btn btn-small" type="submit">Save status</button>
+      </form>
+      {% if report.claims.all %}
+      <h3 style="margin-top:28px">Claim requests</h3>
+      {% for claim in report.claims.all %}
+        <div class="list-row"><div><strong>{{ claim.claimant.first_name|default:claim.claimant.username }}</strong><p style="margin:5px 0">{{ claim.note }}</p><small>{{ claim.get_status_display }} · {{ claim.created_at|date:"M j, g:i a" }}</small></div>
+          {% if claim.status == 'PENDING' %}<div class="actions"><form method="post" action="{% url 'claim_decision' report.pk claim.pk %}">{% csrf_token %}<input type="hidden" name="decision" value="ACCEPTED"><button class="btn btn-small" type="submit">Accept</button></form><form method="post" action="{% url 'claim_decision' report.pk claim.pk %}">{% csrf_token %}<input type="hidden" name="decision" value="DECLINED"><button class="btn btn-light btn-small" type="submit">Decline</button></form></div>{% endif %}
+        </div>
+      {% endfor %}
+      {% endif %}
+    {% endif %}
+  </div>
+  <aside class="side-stack">
+    <div class="panel">
+      <div class="eyebrow">The person behind this report</div><h3>{{ report.reporter.first_name|default:report.reporter.username }}</h3><p>Campus community member · Reported {{ report.created_at|date:"M j, Y" }}</p>
+      {% if user.is_authenticated and not is_owner and report.status != 'RESOLVED' and report.status != 'ARCHIVED' %}
+        <form method="post" action="{% url 'claim_create' report.pk %}">{% csrf_token %}
+          {% for field in claim_form %}<div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}</div>{% endfor %}
+          <button class="btn" style="width:100%" type="submit">Submit a claim</button>
+        </form>
+        <div style="height:1px;background:var(--line);margin:22px 0"></div>
+        <h3>Send a private message</h3><p>Ask a question or share a detail to help verify the item.</p>
+        <form method="post" action="{% url 'send_message' report.pk %}">{% csrf_token %}
+          {% for field in message_form %}<div class="field">{{ field }}{% for error in field.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}</div>{% endfor %}
+          <button class="btn btn-light" style="width:100%" type="submit">Send message ↗</button>
+        </form>
+      {% elif not user.is_authenticated %}
+        <a class="btn" style="width:100%" href="{% url 'login' %}?next={{ request.path }}">Log in to contact</a><p style="margin-top:12px;font-size:.82rem">College students only. Join with your campus email.</p>
+      {% else %}
+        <p>This report is yours or has already been resolved.</p>
+      {% endif %}
+    </div>
+    {% if user.is_authenticated and not is_owner %}
+    <div class="panel"><h3>Something doesn't look right?</h3><p>Flag this listing for campus staff to review.</p><form method="post" action="{% url 'flag_report' report.pk %}">{% csrf_token %}{% for field in flag_form %}{{ field }}{% endfor %}<div class="field"><textarea name="reason" rows="2" maxlength="300" required placeholder="Reason for flagging"></textarea></div><button class="btn btn-light btn-small" type="submit">Flag report</button></form></div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

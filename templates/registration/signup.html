@@ -1,0 +1,17 @@
+
+{% extends "base.html" %}
+{% block title %}Join campus · Findly{% endblock %}
+{% block content %}
+<div class="auth-shell">
+  <div class="auth-logo"><a class="brand" href="{% url 'home' %}"><span class="brand-mark">⌕</span> findly.</a></div>
+  <div class="panel"><div class="form-intro"><div class="eyebrow">One campus. One community.</div><h1 style="font-size:2.4rem">Let's get you in.</h1><p>Create your account with your college email to keep the community campus-only.</p></div>
+    <form method="post">{% csrf_token %}
+      {% if form.non_field_errors %}<div class="notice error">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}
+        <div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<div class="helptext">{{ field.help_text|safe }}</div>{% endif %}{% for error in field.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}</div>
+      {% endfor %}
+      <button class="btn" style="width:100%" type="submit">Create campus account ↗</button>
+    </form><p style="margin-top:18px;text-align:center">Already joined? <a href="{% url 'login' %}">Log in</a></p>
+  </div>
+</div>
+{% endblock %}

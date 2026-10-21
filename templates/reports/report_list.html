@@ -1,0 +1,21 @@
+
+{% extends "base.html" %}
+{% block title %}Browse reports · Findly{% endblock %}
+{% block content %}
+<div class="page-head"><div class="eyebrow">Campus item board</div><h1>Find what you're looking for.</h1><p>Search reports from your campus. Keep an eye out — your missing item might be here.</p></div>
+<form class="panel filter-panel" method="get">
+  <div class="field" style="margin:0"><label for="q">Search reports</label><input id="q" name="q" value="{{ q }}" placeholder="Try “blue bottle” or “library”"></div>
+  <div class="field" style="margin:0"><label for="kind">Report type</label><select id="kind" name="kind"><option value="">All reports</option>{% for value,label in kinds %}<option value="{{ value }}" {% if kind == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <div class="field" style="margin:0"><label for="category">Category</label><select id="category" name="category"><option value="">All categories</option>{% for value,label in categories %}<option value="{{ value }}" {% if category == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <div class="field" style="margin:0"><label for="location">Campus location</label><input id="location" name="location" value="{{ location }}" placeholder="e.g. Library"></div>
+  <div class="field" style="margin:0"><label for="date_from">From date</label><input type="date" id="date_from" name="date_from" value="{{ date_from }}"></div>
+  <div class="field" style="margin:0"><label for="date_to">To date</label><input type="date" id="date_to" name="date_to" value="{{ date_to }}"></div>
+  <div class="actions" style="grid-column:1/-1"><button class="btn" type="submit">Apply filters</button><a class="btn btn-light" href="{% url 'report_list' %}">Clear</a></div>
+</form>
+<div class="section-head" style="margin-top:22px"><div><h2 style="font-size:1.35rem">{{ reports|length }} report{{ reports|length|pluralize }} found</h2></div><a class="btn btn-small" href="{% url 'report_create' %}">＋ Add report</a></div>
+{% if reports %}
+<div class="report-grid">{% for report in reports %}{% include "reports/partials/report_card.html" with report=report %}{% endfor %}</div>
+{% else %}
+<div class="empty-state"><div class="empty-icon">🔍</div><h3>No matches just yet</h3><p>Try another keyword or remove a filter. You can also post a report so others can help.</p><a class="btn" href="{% url 'report_create' %}">Report an item</a></div>
+{% endif %}
+{% endblock %}

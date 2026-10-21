@@ -1,0 +1,15 @@
+
+<article class="report-card">
+  <a href="{% url 'report_detail' report.pk %}" aria-label="View {{ report.title }}" style="color:inherit">
+    <div class="report-photo">
+      {% if report.photo %}<img src="{{ report.photo.url }}" alt="Photo of {{ report.title }}" loading="lazy">{% else %}<span aria-hidden="true">{% if report.category == "Electronics" %}🎧{% elif report.category == "ID cards" %}🪪{% elif report.category == "Books & notes" %}📚{% elif report.category == "Bags & wallets" %}🎒{% elif report.category == "Keys" %}🔑{% elif report.category == "Clothing" %}🧥{% elif report.category == "Stationery" %}✏️{% else %}🔎{% endif %}</span>{% endif %}
+    </div>
+  </a>
+  <div class="report-body">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="pill {% if report.kind == 'LOST' %}pill-lost{% else %}pill-found{% endif %}">{{ report.get_kind_display }}</span><span class="small-muted">{{ report.item_date|date:"M j" }}</span></div>
+    <h3 style="margin-top:13px"><a href="{% url 'report_detail' report.pk %}" style="color:var(--ink)">{{ report.title }}</a></h3>
+    <div class="report-meta"><span>⌖ {{ report.location }}</span></div>
+    <p>{{ report.description|truncatechars:105 }}</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px"><span class="small-muted">{{ report.get_category_display }}</span><a href="{% url 'report_detail' report.pk %}" style="font-weight:800">Details ↗</a></div>
+  </div>
+</article>

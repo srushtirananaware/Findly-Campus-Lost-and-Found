@@ -1,0 +1,19 @@
+
+{% extends "base.html" %}
+{% block title %}Possible matches · Findly{% endblock %}
+{% block content %}
+<div class="page-head"><div class="eyebrow">A little detective work</div><h1>Possible matches</h1><p>Opposite-type reports ranked by a transparent similarity score. Always verify an item privately.</p></div>
+<div class="panel">
+  <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding-bottom:20px;border-bottom:1px solid var(--line)"><span class="pill {% if report.kind == 'LOST' %}pill-lost{% else %}pill-found{% endif %}">{{ report.get_kind_display }}</span><div><strong>{{ report.title }}</strong><div class="small-muted">{{ report.get_category_display }} · {{ report.location }} · {{ report.item_date|date:"M j, Y" }}</div></div></div>
+  {% if matches %}
+    {% for match in matches %}
+      <div class="match-row">
+        <div><div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap"><h3 style="margin:0"><a href="{% url 'report_detail' match.report.pk %}" style="color:var(--ink)">{{ match.report.title }}</a></h3><span class="pill {% if match.report.kind == 'LOST' %}pill-lost{% else %}pill-found{% endif %}">{{ match.report.get_kind_display }}</span></div><div class="report-meta"><span>⌖ {{ match.report.location }}</span><span>·</span><span>{{ match.report.item_date|date:"M j, Y" }}</span></div><div class="small-muted">Why it matched: {{ match.reasons|join:", " }}</div><div class="progress"><span style="width:{{ match.score }}%"></span></div></div>
+        <div style="text-align:center;min-width:95px"><strong style="font:800 1.7rem Manrope;color:var(--green)">{{ match.score }}%</strong><div class="small-muted">similarity</div><a class="btn btn-small" style="margin-top:10px" href="{% url 'report_detail' match.report.pk %}">Review ↗</a></div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state" style="margin-top:20px"><div class="empty-icon">🧩</div><h3>No close matches yet</h3><p>We'll have more clues as students add reports. Check back later or browse all reports.</p><a class="btn" href="{% url 'report_list' %}">Browse reports</a></div>
+  {% endif %}
+</div>
+{% endblock %}

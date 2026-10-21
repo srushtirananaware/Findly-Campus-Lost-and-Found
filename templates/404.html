@@ -1,0 +1,4 @@
+
+{% extends "base.html" %}
+{% block title %}Page not found · Findly{% endblock %}
+{% block content %}<div class="empty-state" style="margin:70px auto;max-width:600px"><div class="empty-icon">🧭</div><h1 style="font-size:2.7rem">This page wandered off.</h1><p>We couldn't find what you were looking for.</p><a class="btn" href="{% url 'home' %}">Back to Findly</a></div>{% endblock %}

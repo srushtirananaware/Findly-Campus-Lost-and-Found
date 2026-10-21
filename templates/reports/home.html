@@ -1,0 +1,44 @@
+
+{% extends "base.html" %}
+{% block title %}Findly — Good things find their way back{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <div class="eyebrow">Your campus, connected</div>
+    <h1>Lost something?<br><span>Let's find it.</span></h1>
+    <p class="hero-copy">A little help from your campus community goes a long way. Report an item, spot a match, and help good things find their way back.</p>
+    <div class="actions">
+      <a class="btn" href="{% url 'report_create' %}">＋ Report an item</a>
+      <a class="btn btn-light" href="{% url 'report_list' %}">Explore reports <span aria-hidden="true">↗</span></a>
+    </div>
+    <p style="font-size:.82rem;margin-top:17px">🔒 College-only community · Private messages · Built for trust</p>
+  </div>
+  <div class="hero-art" aria-label="Illustration of an item being found">
+    <div class="orbit">
+      <div class="finder-card"><div class="finder-icon">🎒</div><strong>Found it!</strong><small>One less thing to worry about.</small><div style="margin-top:17px;display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:50%;background:#dff4e9;display:grid;place-items:center">✓</span><small>Back where it belongs</small></div></div>
+      <span class="float-tag tag-one">✨ Campus kindness</span><span class="float-tag tag-two">📍 Right here on campus</span>
+    </div>
+  </div>
+</section>
+<section class="stats" aria-label="Campus report statistics">
+  <div class="stat"><strong>{{ lost_count }}</strong><span>Items currently lost</span></div>
+  <div class="stat"><strong>{{ found_count }}</strong><span>Items waiting to be claimed</span></div>
+  <div class="stat"><strong>1 campus</strong><span>One community helping out</span></div>
+</section>
+<div class="section-head"><div><div class="eyebrow">Fresh on campus</div><h2>Recently reported</h2><p>New reports from your campus community.</p></div><a href="{% url 'report_list' %}">View all reports ↗</a></div>
+{% if recent_reports %}
+<div class="report-grid">
+  {% for report in recent_reports %}
+    {% include "reports/partials/report_card.html" with report=report %}
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state"><div class="empty-icon">🌱</div><h3>A fresh start</h3><p>No open reports yet. Your first report could help someone out.</p><a class="btn" href="{% url 'report_create' %}">Post the first report</a></div>
+{% endif %}
+<section class="section-head"><div><div class="eyebrow">How Findly works</div><h2>Three steps. One less worry.</h2></div></section>
+<div class="stats">
+  <div class="stat"><span style="font-size:1.5rem">📝</span><h3 style="margin-top:12px">01 · Report it</h3><span>Share what went missing or what you found, with a photo and campus location.</span></div>
+  <div class="stat"><span style="font-size:1.5rem">🧩</span><h3 style="margin-top:12px">02 · Spot a match</h3><span>Findly suggests similar lost and found reports using item details, date and location.</span></div>
+  <div class="stat"><span style="font-size:1.5rem">🤝</span><h3 style="margin-top:12px">03 · Reunite</h3><span>Message the reporter privately, verify distinctive details and mark the item resolved.</span></div>
+</div>
+{% endblock %}

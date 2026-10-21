@@ -1,0 +1,43 @@
+
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f3">
+  <title>{% block title %}Findly — Campus Lost & Found{% endblock %}</title>
+  <meta name="description" content="A trusted lost-and-found hub built for your campus community.">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <script defer src="{% static 'js/app.js' %}"></script>
+</head>
+<body>
+  <header class="container nav">
+    <a class="brand" href="{% url 'home' %}"><span class="brand-mark">⌕</span> findly<span style="color:#146b53">.</span></a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="{% url 'report_list' %}">Browse items</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}">My dashboard{% if user.findly_notifications.count %} <span class="pill">{{ user.findly_notifications.filter.count }}</span>{% endif %}</a>
+        <a href="{% url 'report_create' %}" class="nav-cta">＋ Report an item</a>
+        <form method="post" action="{% url 'logout' %}" style="display:inline">{% csrf_token %}<button class="btn btn-light btn-small" type="submit">Log out</button></form>
+      {% else %}
+        <a href="{% url 'login' %}">Log in</a>
+        <a href="{% url 'signup' %}" class="nav-cta">Join campus</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main class="container">
+    {% if messages %}
+      <div class="messages">
+      {% for message in messages %}
+        <div class="notice {% if message.tags == 'error' %}error{% elif message.tags == 'info' %}info{% endif %}">{{ message }} <button data-dismiss type="button" style="float:right;border:0;background:none;cursor:pointer">✕</button></div>
+      {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="footer">
+    <div class="container footer-inner"><span>© {% now "Y" %} Findly · Made for campus, by campus.</span><span>Keep it kind. Keep personal details private.</span></div>
+  </footer>
+</body>
+</html>

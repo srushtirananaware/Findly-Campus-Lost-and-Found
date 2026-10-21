@@ -1,0 +1,24 @@
+
+{% extends "base.html" %}
+{% block title %}{% if editing %}Edit report{% else %}Report an item{% endif %} · Findly{% endblock %}
+{% block content %}
+<div class="form-layout">
+  <div class="form-intro"><div class="eyebrow">Help your campus help you</div><h1>{% if editing %}Update your report{% else %}Let's get it back.{% endif %}</h1><p>Specific details help people recognise the item. For safety, keep serial numbers, student IDs and other private identifiers out of public descriptions.</p></div>
+  <form method="post" enctype="multipart/form-data" class="panel">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="notice error">{{ form.non_field_errors }}</div>{% endif %}
+    {% for field in form %}
+      <div class="field">
+        <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span style="color:#b42318">*</span>{% endif %}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="helptext">{{ field.help_text }}</div>{% endif %}
+        {% for error in field.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}
+      </div>
+    {% endfor %}
+    {% if report.photo %}<p>Current photo:</p><img src="{{ report.photo.url }}" alt="Current item photo" style="max-width:180px;border-radius:12px;margin-bottom:15px">{% endif %}
+    <img id="photo-preview" alt="New photo preview" hidden style="max-width:220px;max-height:180px;object-fit:cover;border-radius:12px;margin-bottom:16px">
+    <div class="privacy-note">🛡️ Your email address is never shown on public report cards. Students can contact you using Findly's private message feature.</div>
+    <div class="actions" style="margin-top:22px"><button class="btn" type="submit">{% if editing %}Save changes{% else %}Publish report{% endif %} ↗</button><a class="btn btn-light" href="{% if report %}{% url 'report_detail' report.pk %}{% else %}{% url 'report_list' %}{% endif %}">Cancel</a></div>
+  </form>
+</div>
+{% endblock %}

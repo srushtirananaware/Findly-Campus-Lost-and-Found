@@ -1,0 +1,17 @@
+
+{% extends "base.html" %}
+{% block title %}Log in · Findly{% endblock %}
+{% block content %}
+<div class="auth-shell">
+  <div class="auth-logo"><a class="brand" href="{% url 'home' %}"><span class="brand-mark">⌕</span> findly.</a></div>
+  <div class="panel"><div class="form-intro"><div class="eyebrow">Welcome back</div><h1 style="font-size:2.4rem">Good to see you.</h1><p>Log in with your campus account to continue.</p></div>
+    <form method="post">{% csrf_token %}
+      {% if form.errors %}<div class="notice error">Your username or password wasn't recognised.</div>{% endif %}
+      <div class="field"><label for="id_username">Username</label><input id="id_username" name="username" autocomplete="username" required autofocus></div>
+      <div class="field"><label for="id_password">Password</label><input id="id_password" name="password" type="password" autocomplete="current-password" required></div>
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      <button class="btn" style="width:100%" type="submit">Log in ↗</button>
+    </form><p style="margin-top:18px;text-align:center">New to Findly? <a href="{% url 'signup' %}">Join your campus</a></p>
+  </div>
+</div>
+{% endblock %}

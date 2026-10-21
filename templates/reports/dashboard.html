@@ -1,0 +1,36 @@
+
+{% extends "base.html" %}
+{% block title %}My dashboard · Findly{% endblock %}
+{% block content %}
+<div class="page-head"><div class="eyebrow">Your campus activity</div><h1>Hey {{ user.first_name|default:user.username }}, here's your hub.</h1><p>Track reports, respond to messages and keep up with possible reunions.</p></div>
+<div class="actions" style="margin-bottom:22px"><a class="btn" href="{% url 'report_create' %}">＋ Report an item</a><a class="btn btn-light" href="{% url 'report_list' %}">Browse campus reports</a></div>
+<div class="stats">
+  <div class="stat"><strong>{{ my_reports|length }}</strong><span>Your reports</span></div>
+  <div class="stat"><strong>{{ claims_made|length }}</strong><span>Claims you've submitted</span></div>
+  <div class="stat"><strong>{{ unread_count }}</strong><span>Unread notifications</span></div>
+</div>
+<div class="dashboard-grid">
+  <section class="panel"><div class="section-head" style="margin:0 0 12px"><div><h2 style="font-size:1.35rem">Your reports</h2><p>Manage your lost and found posts.</p></div></div>
+    {% for report in my_reports %}
+      <div class="list-row"><div><a href="{% url 'report_detail' report.pk %}"><strong>{{ report.title }}</strong></a><small>{{ report.get_kind_display }} · {{ report.get_status_display }} · {{ report.created_at|date:"M j" }}</small></div><a href="{% url 'report_edit' report.pk %}" class="btn btn-light btn-small">Edit</a></div>
+    {% empty %}<p>You haven't posted any reports yet.</p><a href="{% url 'report_create' %}">Create your first report ↗</a>{% endfor %}
+  </section>
+  <section class="panel"><div class="section-head" style="margin:0 0 12px"><div><h2 style="font-size:1.35rem">Notifications</h2><p>Updates that need your attention.</p></div></div>
+    {% for note in notifications %}
+      <div class="notification {% if note.is_read %}read{% endif %}"><span class="notification-dot"></span><div><a href="{% url 'notification_read' note.pk %}"><strong>{{ note.title }}</strong></a><p style="margin:4px 0">{{ note.body }}</p><small class="small-muted">{{ note.created_at|date:"M j, g:i a" }}</small></div></div>
+    {% empty %}<p>You're all caught up. New messages and match suggestions will show here.</p>{% endfor %}
+  </section>
+  <section class="panel"><h2 style="font-size:1.35rem">Claims you've made</h2><p>Follow up on items you think are yours.</p>
+    {% for claim in claims_made %}<div class="list-row"><div><a href="{% url 'report_detail' claim.report.pk %}"><strong>{{ claim.report.title }}</strong></a><small>{{ claim.get_status_display }} · {{ claim.created_at|date:"M j" }}</small></div><a href="{% url 'report_detail' claim.report.pk %}">Open ↗</a></div>{% empty %}<p>No claims submitted yet.</p>{% endfor %}
+  </section>
+  <section class="panel"><h2 style="font-size:1.35rem">Claims on your reports</h2><p>Review claim requests and coordinate safely.</p>
+    {% for claim in claims_received %}<div class="list-row"><div><a href="{% url 'report_detail' claim.report.pk %}"><strong>{{ claim.report.title }}</strong></a><small>From {{ claim.claimant.first_name|default:claim.claimant.username }} · {{ claim.get_status_display }}</small><p style="margin:5px 0">{{ claim.note|truncatechars:100 }}</p></div><a href="{% url 'report_detail' claim.report.pk %}">Review ↗</a></div>{% empty %}<p>No claims on your reports right now.</p>{% endfor %}
+  </section>
+  <section class="panel"><h2 style="font-size:1.35rem">Messages received</h2>
+    {% for msg in received_messages %}<div class="list-row"><div><strong>{{ msg.sender.first_name|default:msg.sender.username }}</strong><small>Re: {{ msg.report.title }} · {{ msg.created_at|date:"M j" }}</small><p style="margin:5px 0">{{ msg.body|truncatechars:120 }}</p></div><a href="{% url 'report_detail' msg.report.pk %}">Reply ↗</a></div>{% empty %}<p>No private messages yet.</p>{% endfor %}
+  </section>
+  <section class="panel"><h2 style="font-size:1.35rem">Messages sent</h2>
+    {% for msg in sent_messages %}<div class="list-row"><div><strong>To {{ msg.recipient.first_name|default:msg.recipient.username }}</strong><small>Re: {{ msg.report.title }} · {{ msg.created_at|date:"M j" }}</small><p style="margin:5px 0">{{ msg.body|truncatechars:120 }}</p></div><a href="{% url 'report_detail' msg.report.pk %}">Open ↗</a></div>{% empty %}<p>Messages you send will appear here.</p>{% endfor %}
+  </section>
+</div>
+{% endblock %}
